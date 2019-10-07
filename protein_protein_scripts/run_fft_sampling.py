@@ -128,7 +128,7 @@ python ''' + this_script + \
             print("Submitting %s" % complex_name)
             open(qsub_file, "w").write(qsub_script)
             os.system("qsub %s" % qsub_file)
-            job_count += 1
+            job_count += 1  
             if job_count == max_jobs:
                 print("Max number of jobs %d reached." % job_count)
                 break

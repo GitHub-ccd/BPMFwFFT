@@ -24,16 +24,16 @@ class Sampling(object):
                         temperature=300.):
 
 
-        print("rec_prmtop =  "+rec_prmtop + \
-        "\n lj_sigma_scal_fact =  "+str(lj_sigma_scal_fact)+\
-        "\n rec_inpcrd =  "+ rec_inpcrd + \
-        "\n bsite_file =  "+ str(bsite_file) + \
-        "\n grid_nc_file =  " +grid_nc_file + \
-        "\n lig_prmtop =  "+lig_prmtop+\
-        "\n lig_inpcrd =  "+lig_inpcrd+\
+        #print("rec_prmtop =  "+rec_prmtop + \
+        #"\n lj_sigma_scal_fact =  "+str(lj_sigma_scal_fact)+\
+        #"\n rec_inpcrd =  "+ rec_inpcrd + \
+        #"\n bsite_file =  "+ str(bsite_file) + \
+        #"\n grid_nc_file =  " +grid_nc_file + \
+        #"\n lig_prmtop =  "+lig_prmtop+\
+        #"\n lig_inpcrd =  "+lig_inpcrd+\
         #"\n lig_coord_ensemble = "+lig_coord_ensemble+\
-        "\n energy_sample_size_per_ligand =  "+str(energy_sample_size_per_ligand)+\
-        "\n output_nc =  "+output_nc)
+        #"\n energy_sample_size_per_ligand =  "+str(energy_sample_size_per_ligand)+\
+        #"\n output_nc =  "+output_nc)
 
         """
         :param rec_prmtop: str, name of receptor prmtop file
