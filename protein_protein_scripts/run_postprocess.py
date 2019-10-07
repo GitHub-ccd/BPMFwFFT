@@ -52,7 +52,7 @@ if args.submit:
 
     complex_names = glob.glob(os.path.join(sampling_dir, "*"))
     complex_names = [os.path.basename(d) for d in complex_names if os.path.isdir(d)]
-    complex_names = [c for c in complex_names if is_sampling_good(os.path.join(sampling_dir, c))]
+    #complex_names = [c for c in complex_names if is_sampling_good(os.path.join(sampling_dir, c))]
     print(complex_names)
 
     for complex_name in complex_names:

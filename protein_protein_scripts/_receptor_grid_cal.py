@@ -9,7 +9,7 @@ import os
 import numpy as np
 import netCDF4
 
-sys.path.append("/home/tnguye46/opt/src/BPMFwFFT/bpmfwfft")
+sys.path.append("/home/chamila/opt/src/BPMFwFFT/bpmfwfft")
 from IO import InpcrdLoad
 from grids import Grid, RecGrid
 

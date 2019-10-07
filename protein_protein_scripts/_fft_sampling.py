@@ -9,7 +9,7 @@ import os
 import netCDF4
 import numpy as np
 
-sys.path.append("/home/tnguye46/opt/src/BPMFwFFT/bpmfwfft")
+sys.path.append("/home/chamila/opt/src/BPMFwFFT/bpmfwfft")
 from fft_sampling import Sampling
 
 BSITE_FILE = None
@@ -32,6 +32,7 @@ def sampling(rec_prmtop, lj_sigma_scal_fact,
                         output_nc,
                         temperature=300.)
 
+    sys.exit("***beforesampler.run_sampling method***")
     sampler.run_sampling()
     print("Sampling Done")
     return None

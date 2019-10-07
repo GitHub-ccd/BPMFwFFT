@@ -21,7 +21,7 @@ parser.add_argument("--lig_ensemble_dir",              type=str, default="rotati
 
 parser.add_argument("--energy_sample_size_per_ligand", type=int, default=1000)
 parser.add_argument("--nr_lig_conf",                   type=int, default=500)
-parser.add_argument("--start_index",                    type=int, default=0)
+parser.add_argument("--start_index",                    type=int, default=1)
 
 parser.add_argument("--out_dir",                       type=str, default="out")
 
@@ -40,13 +40,14 @@ LIG_COOR_NC = "rotation.nc"
 GRID_NC = "grid.nc"
 FFT_SAMPLING_NC = "fft_sample.nc"
 
+
 def is_running(qsub_file, log_file, nc_file):
     if os.path.exists(qsub_file) and (not os.path.exists(nc_file)) and (not os.path.exists(log_file)):
         return True
     if os.path.exists(qsub_file) and os.path.exists(nc_file) and (not os.path.exists(log_file)):
         return True
     return False
-  
+
 
 if args.submit:
     this_script = os.path.abspath(sys.argv[0])
@@ -101,7 +102,7 @@ if args.submit:
 #PBS -j oe
 #PBS -l nodes=1:ppn=4,walltime=300:00:00
 
-source /home/tnguye46/opt/module/anaconda.sh
+# source /home/tnguye46/opt/module/anaconda.sh
 date
 python ''' + this_script + \
         ''' --amber_dir ''' + amber_sub_dir + \
@@ -127,7 +128,7 @@ python ''' + this_script + \
 
             print("Submitting %s" % complex_name)
             open(qsub_file, "w").write(qsub_script)
-            os.system("qsub %s" % qsub_file)
+            #os.system("qsub %s" % qsub_file)
             job_count += 1
             if job_count == max_jobs:
                 print("Max number of jobs %d reached." % job_count)

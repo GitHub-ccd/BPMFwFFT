@@ -3,7 +3,7 @@ define function to run postprocessing
 """
 import sys
 
-sys.path.append("/home/tnguye46/opt/src/BPMFwFFT/bpmfwfft")
+sys.path.append("/home/chamila/opt/src/BPMFwFFT/bpmfwfft")
 from postprocess import PostProcess
 
 
