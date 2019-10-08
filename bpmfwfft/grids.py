@@ -205,6 +205,11 @@ class LigGrid(Grid):
     """
     def __init__(self, prmtop_file_name, lj_sigma_scaling_factor, 
                        inpcrd_file_name, receptor_grid):
+        #debug is here ***
+        sys.exit(print("prmtop_file_name:   \n", prmtop_file_name+\
+                       "lj_sigma_scaling_factor:   \n", str(lj_sigma_scaling_factor)+\
+                       "inpcrd_file_name:   \n", inpcrd_file_name+\
+                       "receptor_grid:   \n", str(receptor_grid)))                 
         """
         :param prmtop_file_name: str, name of AMBER prmtop file
         :param lj_sigma_scaling_factor: float
@@ -385,7 +390,6 @@ class LigGrid(Grid):
         molecular_coord:    2-array, new liagnd coordinate
         """
         crd = np.array(molecular_coord, dtype=float)
-        sys.exit(print("crd:   \n", crd ))                  #debug is here ***
         natoms = self._prmtop["POINTERS"]["NATOM"]
         if (crd.shape[0] != natoms) or (crd.shape[1] != 3):
             raise RuntimeError("Input coord does not have the correct shape.")
