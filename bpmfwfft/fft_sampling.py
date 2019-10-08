@@ -156,6 +156,7 @@ class Sampling(object):
 
     def _do_fft(self, step):
         print("Doing FFT for step %d"%step)
+        sys.exit("***step=0 I'm here***")
         lig_conf = self._lig_coord_ensemble[step]
         self._lig_grid.cal_grids(molecular_coord = lig_conf)
 
@@ -191,7 +192,6 @@ class Sampling(object):
         """
         """
         for step in range(self._lig_coord_ensemble.shape[0]):
-            sys.exit("***step=0 still _do_fft will run***")
             self._do_fft(step)
 
             print("Min energy", self._min_energy)
