@@ -5,6 +5,7 @@ import os
 
 import numpy as np
 import netCDF4
+import sys
 
 import IO
 from util import c_is_in_grid, cdistance, c_containing_cube
@@ -333,6 +334,7 @@ class LigGrid(Grid):
         self._free_of_clash = self._free_of_clash[0:max_i, 0:max_j, 0:max_k]  # exclude positions where ligand crosses border
         
         self._meaningful_energies = np.zeros(self._grid["counts"], dtype=float)
+        sys.exit(print("#_meaningful_energies: \n", _meaningful_energies )) #debug is here ***
         if np.any(self._free_of_clash):
             grid_names = [name for name in self._grid_func_names if name != "occupancy"]
             for name in grid_names:
