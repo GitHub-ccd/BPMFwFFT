@@ -205,11 +205,6 @@ class LigGrid(Grid):
     """
     def __init__(self, prmtop_file_name, lj_sigma_scaling_factor, 
                        inpcrd_file_name, receptor_grid):
-        #debug is here ***
-        sys.exit(print("prmtop_file_name:   ", prmtop_file_name+\
-                       "\nlj_sigma_scaling_factor:   ", str(lj_sigma_scaling_factor)+\
-                       "\ninpcrd_file_name:   ", inpcrd_file_name+\
-                       "\nreceptor_grid:   ", str(receptor_grid.__getattribute__)))                 
         """
         :param prmtop_file_name: str, name of AMBER prmtop file
         :param lj_sigma_scaling_factor: float
@@ -223,6 +218,8 @@ class LigGrid(Grid):
                                 lj_sigma_scaling_factor, grid_data["lj_sigma_scaling_factor"][0]))
         
         entries = [key for key in grid_data.keys() if key not in self._grid_func_names]
+        #debug is here ***
+        sys.exit(print("entries:   ", entries))
         print("Copy entries from receptor_grid", entries)
         for key in entries:
             self._set_grid_key_value(key, grid_data[key])
