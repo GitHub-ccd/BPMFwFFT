@@ -156,8 +156,8 @@ class Sampling(object):
 
     def _do_fft(self, step):
         print("Doing FFT for step %d"%step)
-        sys.exit(print("This works too... step= ", step))
         lig_conf = self._lig_coord_ensemble[step]
+        sys.exit(print("lig_conf: \n", lig_conf))
         self._lig_grid.cal_grids(molecular_coord = lig_conf)
 
         energies = self._lig_grid.get_meaningful_energies()
