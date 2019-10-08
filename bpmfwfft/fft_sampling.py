@@ -6,7 +6,6 @@ from __future__ import print_function
 
 import numpy as np
 import netCDF4
-import sys
 
 from grids import RecGrid
 from grids import LigGrid
@@ -160,7 +159,6 @@ class Sampling(object):
         self._lig_grid.cal_grids(molecular_coord = lig_conf)
 
         energies = self._lig_grid.get_meaningful_energies()
-        sys.exit(print("#meaningful energies: \n", len(energies))) #debug is here ***
         self._mean_energy = energies.mean()
         self._min_energy  = energies.min()
         self._energy_std  = energies.std()
@@ -189,7 +187,7 @@ class Sampling(object):
         return None
 
     def run_sampling(self):
-        """
+        """   
         """
         for step in range(self._lig_coord_ensemble.shape[0]):
             self._do_fft(step)
