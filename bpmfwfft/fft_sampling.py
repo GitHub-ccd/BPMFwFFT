@@ -6,6 +6,7 @@ from __future__ import print_function
 
 import numpy as np
 import netCDF4
+import sys
 
 from grids import RecGrid
 from grids import LigGrid
@@ -22,19 +23,6 @@ class Sampling(object):
                         energy_sample_size_per_ligand,
                         output_nc,
                         temperature=300.):
-
-
-        print("rec_prmtop =  "+rec_prmtop + \
-        "\n lj_sigma_scal_fact =  "+str(lj_sigma_scal_fact)+\
-        "\n rec_inpcrd =  "+ rec_inpcrd + \
-        "\n bsite_file =  "+ str(bsite_file) + \
-        "\n grid_nc_file =  " +grid_nc_file + \
-        "\n lig_prmtop =  "+lig_prmtop+\
-        "\n lig_inpcrd =  "+lig_inpcrd+\
-        #"\n lig_coord_ensemble = "+lig_coord_ensemble+\
-        "\n energy_sample_size_per_ligand =  "+str(energy_sample_size_per_ligand)+\
-        "\n output_nc =  "+output_nc)
-
         """
         :param rec_prmtop: str, name of receptor prmtop file
         :param lj_sigma_scal_fact: float, used to check consitency when loading receptor and ligand grids
@@ -202,6 +190,9 @@ class Sampling(object):
     def run_sampling(self):
         """
         """
+        for step in range(self._lig_coord_ensemble.shape[0]):
+            print(step)
+        sys.exit("***what is \"step\" here ?***")
         for step in range(self._lig_coord_ensemble.shape[0]):
             self._do_fft(step)
 
