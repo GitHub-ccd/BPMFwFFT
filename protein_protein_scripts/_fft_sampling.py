@@ -32,7 +32,7 @@ def sampling(rec_prmtop, lj_sigma_scal_fact,
                         output_nc,
                         temperature=300.)
 
-    #sys.exit("***beforesampler.run_sampling method***")
+    sys.exit("***beforesampler.run_sampling method***")
     sampler.run_sampling()
     print("Sampling Done")
     return None
