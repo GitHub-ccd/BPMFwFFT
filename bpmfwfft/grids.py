@@ -206,10 +206,10 @@ class LigGrid(Grid):
     def __init__(self, prmtop_file_name, lj_sigma_scaling_factor, 
                        inpcrd_file_name, receptor_grid):
         #debug is here ***
-        sys.exit(print("prmtop_file_name:   \n", prmtop_file_name+\
-                       "lj_sigma_scaling_factor:   \n", str(lj_sigma_scaling_factor)+\
-                       "inpcrd_file_name:   \n", inpcrd_file_name+\
-                       "receptor_grid:   \n", str(receptor_grid)))                 
+        sys.exit(print("prmtop_file_name:   ", prmtop_file_name+\
+                       "\nlj_sigma_scaling_factor:   ", str(lj_sigma_scaling_factor)+\
+                       "\ninpcrd_file_name:   ", inpcrd_file_name+\
+                       "\nreceptor_grid:   ", str(receptor_grid.__getattribute__)))                 
         """
         :param prmtop_file_name: str, name of AMBER prmtop file
         :param lj_sigma_scaling_factor: float
