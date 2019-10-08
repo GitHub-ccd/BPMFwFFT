@@ -334,7 +334,7 @@ class LigGrid(Grid):
         self._free_of_clash = self._free_of_clash[0:max_i, 0:max_j, 0:max_k]  # exclude positions where ligand crosses border
         
         self._meaningful_energies = np.zeros(self._grid["counts"], dtype=float)
-        sys.exit(print("#_meaningful_energies:   \n", self._meaningful_energies.shape )) #debug is here ***
+        
         if np.any(self._free_of_clash):
             grid_names = [name for name in self._grid_func_names if name != "occupancy"]
             for name in grid_names:
@@ -385,6 +385,7 @@ class LigGrid(Grid):
         molecular_coord:    2-array, new liagnd coordinate
         """
         crd = np.array(molecular_coord, dtype=float)
+        sys.exit(print("crd:   \n", crd ))                  #debug is here ***
         natoms = self._prmtop["POINTERS"]["NATOM"]
         if (crd.shape[0] != natoms) or (crd.shape[1] != 3):
             raise RuntimeError("Input coord does not have the correct shape.")
