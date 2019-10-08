@@ -191,9 +191,7 @@ class Sampling(object):
         """
         """
         for step in range(self._lig_coord_ensemble.shape[0]):
-            print(step)
-        sys.exit("***what is \"step\" here ?***")
-        for step in range(self._lig_coord_ensemble.shape[0]):
+            sys.exit("***step=0 still _do_fft will run***")
             self._do_fft(step)
 
             print("Min energy", self._min_energy)
