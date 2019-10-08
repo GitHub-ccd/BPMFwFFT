@@ -160,7 +160,7 @@ class Sampling(object):
         self._lig_grid.cal_grids(molecular_coord = lig_conf)
 
         energies = self._lig_grid.get_meaningful_energies()
-        sys.exit(print("meaningful energies: \n", energies)) #debug is here ***
+        sys.exit(print("#meaningful energies: \n", len(energies))) #debug is here ***
         self._mean_energy = energies.mean()
         self._min_energy  = energies.min()
         self._energy_std  = energies.std()
