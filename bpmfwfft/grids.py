@@ -218,7 +218,7 @@ class LigGrid(Grid):
                                 lj_sigma_scaling_factor, grid_data["lj_sigma_scaling_factor"][0]))
         
         entries = [key for key in grid_data.keys() if key not in self._grid_func_names]
-        #debug is here ***
+        #debug is here ***    
         sys.exit(print("entries:   ", entries))
         print("Copy entries from receptor_grid", entries)
         for key in entries:
