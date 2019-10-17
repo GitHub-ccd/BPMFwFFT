@@ -237,15 +237,16 @@ class LigGrid(Grid):
         store self._max_grid_indices and self._initial_com
         """
         spacing = self._grid["spacing"]
+        
         lower_ligand_corner = np.array([self._crd[:,i].min() for i in range(3)], dtype=float) - 1.5*spacing
         upper_ligand_corner = np.array([self._crd[:,i].max() for i in range(3)], dtype=float) + 1.5*spacing
         #
+        
         ligand_box_lenghts = upper_ligand_corner - lower_ligand_corner
         if np.any(ligand_box_lenghts < 0):
             raise RuntimeError("One of the ligand box lenghts are negative")
 
         max_grid_indices = np.ceil(ligand_box_lenghts / spacing)
-
         self._max_grid_indices = self._grid["counts"] - np.array(max_grid_indices, dtype=int)
 
         if np.any(self._max_grid_indices <= 1):
@@ -289,15 +290,16 @@ class LigGrid(Grid):
         grid = self._cal_charge_grid(grid_name)
 
         self._set_grid_key_value(grid_name, grid)
-        corr_func = np.fft.fftn(self._grid[grid_name])
+        corr_func = np.fft.fftn(self._grid[grid_name])   # corr_func.shape = 338,338,338
+
         self._set_grid_key_value(grid_name, None)           # to save memory
 
         corr_func = corr_func.conjugate()
-        corr_func = np.fft.ifftn(self._rec_FFTs[grid_name] * corr_func)
+        corr_func = np.fft.ifftn(self._rec_FFTs[grid_name] * corr_func)    # corr_func.shape = 338,338,338
         corr_func = np.real(corr_func)
         return corr_func
 
-    def _do_forward_fft(self, grid_name):
+    def _do_forward_fft(self, grid_name): # not used
         assert grid_name in self._grid_func_names, "%s is not an allowed grid name"%grid_name
         grid = self._cal_charge_grid(grid_name)
         self._set_grid_key_value(grid_name, grid)
@@ -305,7 +307,7 @@ class LigGrid(Grid):
         self._set_grid_key_value(grid_name, None)           # to save memory
         return forward_fft
 
-    def _cal_corr_funcs(self, grid_names):
+    def _cal_corr_funcs(self, grid_names): # not used 
         """
         :param grid_names: list of str
         :return:
@@ -331,7 +333,9 @@ class LigGrid(Grid):
         meaningful means no boder-crossing and no clashing
         TODO
         """
-        max_i, max_j, max_k = self._max_grid_indices
+        max_i, max_j, max_k = [1, 1, 1] #self._max_grid_indices max_i, max_j, max_k = [250 228 240]
+        # This Debug
+        #sys.exit(print("\n ***debug self._max_grid_indices: ", self._max_grid_indices , "\n***debug***"))
 
         corr_func = self._cal_corr_func("occupancy")
         self._free_of_clash = (corr_func  < 0.001)
@@ -341,13 +345,15 @@ class LigGrid(Grid):
         
         if np.any(self._free_of_clash):
             grid_names = [name for name in self._grid_func_names if name != "occupancy"]
+            
             for name in grid_names:
-                self._meaningful_energies += self._cal_corr_func(name) 
+                self._meaningful_energies += self._cal_corr_func(name)   #  _meaningful_energies.shape [338, 338, 338]
+
         
         self._meaningful_energies = self._meaningful_energies[0:max_i, 0:max_j, 0:max_k] # exclude positions where ligand crosses border
         
         self._meaningful_energies = self._meaningful_energies[self._free_of_clash]         # exclude positions where ligand is in clash with receptor, become 1D array
-        self._number_of_meaningful_energies = self._meaningful_energies.shape[0]
+        self._number_of_meaningful_energies = self._meaningful_energies.shape[0]         # [338, 338, 338]
         
         return None
 
@@ -405,7 +411,6 @@ class LigGrid(Grid):
         if molecular_coord is not None:
             self._place_ligand_crd_in_grid(molecular_coord)
         else:
-            iii=1
             self._move_ligand_to_lower_corner()         # this is just in case the self._crd is not at the right position
         
         self._cal_energies()
@@ -432,7 +437,7 @@ class LigGrid(Grid):
         correction = -temperature * kB * np.log(V_binding / V_0 / 8 / np.pi**2)
         return bpmf + correction
     
-    def get_number_translations(self):
+    def get_number_translations(self): 
         return self._max_grid_indices.prod()
     
     def get_box_volume(self):
@@ -510,8 +515,7 @@ class RecGrid(Grid):
             nc_handle.close()
          
         self._load_precomputed_grids(grid_nc_file, lj_sigma_scaling_factor)
-        # This Debug
-        sys.exit(print("***debug lj_sigma_scaling_factor***\n", lj_sigma_scaling_factor ,"\n***debug***"))       
+      
 
     def _load_precomputed_grids(self, grid_nc_file, lj_sigma_scaling_factor):
         """
@@ -532,7 +536,6 @@ class RecGrid(Grid):
                 lj_sigma_scaling_factor, grid_nc_file, self._grid["lj_sigma_scaling_factor"][0]))
 
         self._initialize_convenient_para()
-
         natoms = self._prmtop["POINTERS"]["NATOM"]
         if natoms != nc_handle.variables["trans_crd"].shape[0]:
             raise RuntimeError("Number of atoms is wrong in %s"%nc_file_name)
