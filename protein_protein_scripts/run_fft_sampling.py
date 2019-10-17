@@ -19,7 +19,7 @@ parser.add_argument("--coord_dir",                     type=str, default="min")
 parser.add_argument("--grid_dir",                      type=str, default="grid")
 parser.add_argument("--lig_ensemble_dir",              type=str, default="rotation")
 
-parser.add_argument("--energy_sample_size_per_ligand", type=int, default=1000)
+parser.add_argument("--energy_sample_size_per_ligand", type=int, default=8)  #default=1000
 parser.add_argument("--nr_lig_conf",                   type=int, default=500)
 parser.add_argument("--start_index",                    type=int, default=0)
 

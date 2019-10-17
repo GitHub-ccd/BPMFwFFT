@@ -248,6 +248,7 @@ class LigGrid(Grid):
 
         max_grid_indices = np.ceil(ligand_box_lenghts / spacing)
         self._max_grid_indices = self._grid["counts"] - np.array(max_grid_indices, dtype=int)
+        self._max_grid_indices = [2, 2, 2]
 
         if np.any(self._max_grid_indices <= 1):
             raise RuntimeError("At least one of the max grid indices is <= one")
@@ -333,7 +334,7 @@ class LigGrid(Grid):
         meaningful means no boder-crossing and no clashing
         TODO
         """
-        max_i, max_j, max_k = [1, 1, 1] #self._max_grid_indices max_i, max_j, max_k = [250 228 240]
+        max_i, max_j, max_k = self._max_grid_indices # max_i, max_j, max_k = [250 228 240]
         # This Debug
         #sys.exit(print("\n ***debug self._max_grid_indices: ", self._max_grid_indices , "\n***debug***"))
 

@@ -169,8 +169,7 @@ class Sampling(object):
         exp_energies = np.exp(exp_energies - self._log_of_divisor)
         self._exponential_sum = exp_energies.sum()
         exp_energies /= self._exponential_sum
-        #sel_ind = np.random.choice(exp_energies.shape[0], size=self._energy_sample_size_per_ligand, p=exp_energies, replace=False)
-        sel_ind = np.random.choice(exp_energies.shape[0], size=1, p=exp_energies, replace=False)
+        sel_ind = np.random.choice(exp_energies.shape[0], size=self._energy_sample_size_per_ligand, p=exp_energies, replace=False)
         del exp_energies
 
         self._resampled_energies = [energies[ind] for ind in sel_ind]
