@@ -1,4 +1,4 @@
-
+from __future__ import print_function
 cimport cython
 import numpy as np
 cimport numpy as np
@@ -374,7 +374,7 @@ def c_cal_charge_grid(  str name,
                         np.ndarray[np.float64_t, ndim=1] grid_x,
                         np.ndarray[np.float64_t, ndim=1] grid_y,
                         np.ndarray[np.float64_t, ndim=1] grid_z ):
-
+    
     cdef:
         int atom_ind, i, l, m, n 
         int natoms = crd.shape[0]
@@ -386,9 +386,13 @@ def c_cal_charge_grid(  str name,
         np.ndarray[np.float64_t, ndim=1] distributed_charges
         np.ndarray[np.float64_t, ndim=1] atom_coordinate
         np.ndarray[np.float64_t, ndim=3] grid = np.zeros([i_max, j_max, k_max], dtype=np.float)
+        #print("*******util.pyx**i_max, j_max, k_max:  ", i_max, j_max, k_max, "*******end*******")
+        print "Maybe this works" 
+        cout >> "This works"
+        
 
     assert name in ["occupancy", "LJa", "LJr", "electrostatic"], "Name %s not allowed"%name
-
+    
     if name != "occupancy":
         for atom_ind in range(natoms):
             atom_coordinate = crd[atom_ind]

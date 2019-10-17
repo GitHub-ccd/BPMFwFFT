@@ -51,6 +51,7 @@ class Grid(object):
 
         self._six_corner_shifts = self._get_six_corner_shifts()
 
+
     def _get_six_corner_shifts(self):
         six_corner_shifts = []
         for i in [-1, 1]:
@@ -218,8 +219,6 @@ class LigGrid(Grid):
                                 lj_sigma_scaling_factor, grid_data["lj_sigma_scaling_factor"][0]))
         
         entries = [key for key in grid_data.keys() if key not in self._grid_func_names]
-        #debug is here ***    
-        sys.exit(print("entries:   ", entries))
         print("Copy entries from receptor_grid", entries)
         for key in entries:
             self._set_grid_key_value(key, grid_data[key])
@@ -272,10 +271,14 @@ class LigGrid(Grid):
 
     def _cal_charge_grid(self, name):
         charges = self._get_charges(name)
+        #print("\n charges: \n", charges, "\n ******charges end********")
         grid = c_cal_charge_grid(name, self._crd, charges, self._origin_crd, 
                                 self._uper_most_corner_crd, self._uper_most_corner,
                                 self._grid["spacing"], self._eight_corner_shifts, self._six_corner_shifts,
                                 self._grid["x"], self._grid["y"], self._grid["z"])
+        #debug is here ***    
+        #sys.exit(print("\n _cal_charge_grid: \n", grid, "\n ******debug end********"))
+        sys.exit()
         return grid
 
     def _cal_corr_func(self, grid_name):
