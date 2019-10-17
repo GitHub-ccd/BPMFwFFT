@@ -387,8 +387,7 @@ def c_cal_charge_grid(  str name,
         np.ndarray[np.float64_t, ndim=1] atom_coordinate
         np.ndarray[np.float64_t, ndim=3] grid = np.zeros([i_max, j_max, k_max], dtype=np.float)
         #print("*******util.pyx**i_max, j_max, k_max:  ", i_max, j_max, k_max, "*******end*******")
-        print "Maybe this works" 
-        cout >> "This works"
+        #print(i_max)
         
 
     assert name in ["occupancy", "LJa", "LJr", "electrostatic"], "Name %s not allowed"%name

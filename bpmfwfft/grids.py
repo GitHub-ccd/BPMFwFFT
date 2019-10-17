@@ -206,6 +206,7 @@ class LigGrid(Grid):
     """
     def __init__(self, prmtop_file_name, lj_sigma_scaling_factor, 
                        inpcrd_file_name, receptor_grid):
+        
         """
         :param prmtop_file_name: str, name of AMBER prmtop file
         :param lj_sigma_scaling_factor: float
@@ -244,7 +245,9 @@ class LigGrid(Grid):
             raise RuntimeError("One of the ligand box lenghts are negative")
 
         max_grid_indices = np.ceil(ligand_box_lenghts / spacing)
+
         self._max_grid_indices = self._grid["counts"] - np.array(max_grid_indices, dtype=int)
+
         if np.any(self._max_grid_indices <= 1):
             raise RuntimeError("At least one of the max grid indices is <= one")
         
@@ -271,14 +274,10 @@ class LigGrid(Grid):
 
     def _cal_charge_grid(self, name):
         charges = self._get_charges(name)
-        #print("\n charges: \n", charges, "\n ******charges end********")
         grid = c_cal_charge_grid(name, self._crd, charges, self._origin_crd, 
                                 self._uper_most_corner_crd, self._uper_most_corner,
                                 self._grid["spacing"], self._eight_corner_shifts, self._six_corner_shifts,
                                 self._grid["x"], self._grid["y"], self._grid["z"])
-        #debug is here ***    
-        #sys.exit(print("\n _cal_charge_grid: \n", grid, "\n ******debug end********"))
-        sys.exit()
         return grid
 
     def _cal_corr_func(self, grid_name):
@@ -406,6 +405,7 @@ class LigGrid(Grid):
         if molecular_coord is not None:
             self._place_ligand_crd_in_grid(molecular_coord)
         else:
+            iii=1
             self._move_ligand_to_lower_corner()         # this is just in case the self._crd is not at the right position
         
         self._cal_energies()
@@ -486,6 +486,7 @@ class RecGrid(Grid):
         self._load_prmtop(prmtop_file_name, lj_sigma_scaling_factor)
         self._FFTs = {}
 
+
         if new_calculation:
             self._load_inpcrd(inpcrd_file_name)
             nc_handle = netCDF4.Dataset(grid_nc_file, "w", format="NETCDF4")
@@ -507,8 +508,10 @@ class RecGrid(Grid):
             self._cal_potential_grids(nc_handle)
             self._write_to_nc(nc_handle, "trans_crd", self._crd)
             nc_handle.close()
-                
+         
         self._load_precomputed_grids(grid_nc_file, lj_sigma_scaling_factor)
+        # This Debug
+        sys.exit(print("***debug lj_sigma_scaling_factor***\n", lj_sigma_scaling_factor ,"\n***debug***"))       
 
     def _load_precomputed_grids(self, grid_nc_file, lj_sigma_scaling_factor):
         """
