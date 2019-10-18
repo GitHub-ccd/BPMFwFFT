@@ -48,7 +48,6 @@ class Grid(object):
 
         self._eight_corner_shifts = [np.array([i,j,k], dtype=int) for i in range(2) for j in range(2) for k in range(2)]
         self._eight_corner_shifts = np.array(self._eight_corner_shifts, dtype=int)
-
         self._six_corner_shifts = self._get_six_corner_shifts()
 
 
@@ -277,8 +276,8 @@ class LigGrid(Grid):
     def _cal_charge_grid(self, name):
         charges = self._get_charges(name)
         # This Debug
-        sys.exit(print("\n ***debug self._eight_corner_shifts: ", self._eight_corner_shifts ,\
-        "\n ***debug self._grid-x: ", len(self._grid["x"]),  "\n***debug***"))
+        #sys.exit(print("\n ***debug self._eight_corner_shifts: ", self._eight_corner_shifts ,\
+        #"\n ***debug self._grid-x: ", len(self._grid["x"]),  "\n***debug***"))
         grid = c_cal_charge_grid(name, self._crd, charges, self._origin_crd, 
                                 self._uper_most_corner_crd, self._uper_most_corner,
                                 self._grid["spacing"], self._eight_corner_shifts, self._six_corner_shifts,
@@ -517,6 +516,7 @@ class RecGrid(Grid):
             nc_handle.close()
          
         self._load_precomputed_grids(grid_nc_file, lj_sigma_scaling_factor)
+        print("************inside __init__") # debug
       
 
     def _load_precomputed_grids(self, grid_nc_file, lj_sigma_scaling_factor):
@@ -549,6 +549,7 @@ class RecGrid(Grid):
             self._set_grid_key_value(key, None)     # to save memory
 
         nc_handle.close()
+        print("************inside _load_precomputed_grids") # debug
         return None
 
     def _cal_FFT(self, name):
@@ -556,6 +557,7 @@ class RecGrid(Grid):
             raise RuntimeError("%s is not allowed.")
         print("Doing FFT for %s"%name)
         FFT = np.fft.fftn(self._grid[name])
+        print("************inside _cal_FFT") # debug
         return FFT
 
     def _write_to_nc(self, nc_handle, key, value):
@@ -578,6 +580,7 @@ class RecGrid(Grid):
 
         # save data
         nc_handle.variables[key][:] = value
+        print("************inside _write_to_nc") # debug
         return None
 
     def _cal_grid_parameters_with_bsite(self, spacing, bsite_file, nc_handle):
@@ -604,6 +607,7 @@ class RecGrid(Grid):
 
         for key in ["origin", "d0", "d1", "d2", "spacing", "counts"]:
             self._write_to_nc(nc_handle, key, self._grid[key])
+        print("************inside _cal_grid_parameters_with_bsite") # debug
         return None
     
     def _cal_grid_parameters_without_bsite(self, spacing, extra_buffer, nc_handle):
@@ -637,6 +641,7 @@ class RecGrid(Grid):
 
         for key in ["origin", "d0", "d1", "d2", "spacing", "counts"]:
             self._write_to_nc(nc_handle, key, self._grid[key])
+        print("************inside _cal_grid_parameters_without_bsite") # debug
         return None
     
     def _move_receptor_to_grid_center(self):
@@ -654,6 +659,7 @@ class RecGrid(Grid):
 
         for atom_ind in range(len(self._crd)):
             self._crd[atom_ind] += displacement
+        print("************inside _move_receptor_to_grid_center") # debug
         return None
     
     def _cal_grid_coordinates(self, nc_handle):
@@ -682,6 +688,7 @@ class RecGrid(Grid):
 
         for key in ["x", "y", "z"]:
             self._write_to_nc(nc_handle, key, self._grid[key])
+        print("************inside _cal_grid_coordinates") # debug
         return None
 
     def _get_charges(self, name):
@@ -697,6 +704,8 @@ class RecGrid(Grid):
             return np.array([0], dtype=float)
         else:
             raise RuntimeError("%s is unknown"%name)
+        print("************inside _get_charges") # debug
+        return None
 
     def _cal_potential_grids(self, nc_handle):
         """
@@ -714,6 +723,7 @@ class RecGrid(Grid):
             self._write_to_nc(nc_handle, name, grid)
             self._set_grid_key_value(name, grid)
             #self._set_grid_key_value(name, None)     # to save memory
+        print("************inside _cal_potential_grids") # debug
         return None
     
     def _exact_values(self, coordinate):
@@ -741,6 +751,7 @@ class RecGrid(Grid):
                 values["LJr"] +=  self._prmtop["R_LJ_CHARGE"][atom_ind] / R**12
                 values["LJa"] += -2. * self._prmtop["A_LJ_CHARGE"][atom_ind] / R**6
         
+        print("************inside _exact_values") # debug
         return values
     
     def _trilinear_interpolation( self, grid_name, coordinate ):
@@ -772,6 +783,7 @@ class RecGrid(Grid):
         c1 = c01*(1. - yd) + c11*yd
         
         c = c0*(1. - zd) + c1*zd
+        print("************inside _trilinear_interpolation") # debug
         return c
     
     def direct_energy(self, ligand_coordinate, ligand_charges):
@@ -787,6 +799,7 @@ class RecGrid(Grid):
             energy += potentials["electrostatic"]*ligand_charges["CHARGE_E_UNIT"][atom_ind]
             energy += potentials["LJr"]*ligand_charges["R_LJ_CHARGE"][atom_ind]
             energy += potentials["LJa"]*ligand_charges["A_LJ_CHARGE"][atom_ind]
+        print("************inside direct_energy") # debug
         return energy
     
     def interpolated_energy(self, ligand_coordinate, ligand_charges):
@@ -808,17 +821,21 @@ class RecGrid(Grid):
             energy += potentials["LJr"]*ligand_charges["R_LJ_CHARGE"][atom_ind]
             energy += potentials["LJa"]*ligand_charges["A_LJ_CHARGE"][atom_ind]
         
+        print("************inside interpolated_energy") # debug
         return energy
 
     def get_FFTs(self):
+        print("************inside get_FFTs") # debug
         return self._FFTs
 
     def write_box(self, file_name):
         IO.write_box(self, file_name)
+        print("************inside write_box") # debug
         return None
 
     def write_pdb(self, file_name, mode):
         IO.write_pdb(self._prmtop, self._crd, file_name, mode)
+        print("************inside write_pdb") # debug
         return None
 
 
