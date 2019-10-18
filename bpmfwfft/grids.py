@@ -204,7 +204,7 @@ class LigGrid(Grid):
     Calculate the "charge" part of the interaction energy.
     """
     def __init__(self, prmtop_file_name, lj_sigma_scaling_factor, 
-                       inpcrd_file_name, receptor_grid):
+                       inpcrd_file_name, receptor_grid):                  #1
         
         """
         :param prmtop_file_name: str, name of AMBER prmtop file
@@ -230,7 +230,8 @@ class LigGrid(Grid):
         self._load_inpcrd(inpcrd_file_name)
         self._move_ligand_to_lower_corner()
         
-    def _move_ligand_to_lower_corner(self):
+        
+    def _move_ligand_to_lower_corner(self):        #2 
         """
         move ligand to near the grid lower corner 
         store self._max_grid_indices and self._initial_com
@@ -261,7 +262,6 @@ class LigGrid(Grid):
     
     def _get_charges(self, name):
         assert name in self._grid_func_names, "%s is not allowed"%name
-
         if name == "electrostatic":
             return np.array(self._prmtop["CHARGE_E_UNIT"], dtype=float)
         elif name == "LJa":
@@ -273,7 +273,7 @@ class LigGrid(Grid):
         else:
             raise RuntimeError("%s is unknown"%name)
 
-    def _cal_charge_grid(self, name):
+    def _cal_charge_grid(self, name):          #5 
         charges = self._get_charges(name)
         # This Debug
         #sys.exit(print("\n ***debug self._eight_corner_shifts: ", self._eight_corner_shifts ,\
@@ -284,7 +284,7 @@ class LigGrid(Grid):
                                 self._grid["x"], self._grid["y"], self._grid["z"])
         return grid
 
-    def _cal_corr_func(self, grid_name):
+    def _cal_corr_func(self, grid_name):                         #6
         """
         :param grid_name: str
         :return: fft correlation function
@@ -329,7 +329,7 @@ class LigGrid(Grid):
         corr_func = np.real(corr_func)
         return corr_func
 
-    def _cal_energies(self):
+    def _cal_energies(self):     #7
         """
         calculate interaction energies
         store self._meaningful_energies (1-array) and self._meaningful_corners (2-array)
@@ -382,7 +382,7 @@ class LigGrid(Grid):
         self._number_of_meaningful_energies = self._meaningful_energies.shape[0]
         return None
     
-    def _cal_meaningful_corners(self):
+    def _cal_meaningful_corners(self):   #11
         """
         return grid corners corresponding to self._meaningful_energies
         """
@@ -391,7 +391,7 @@ class LigGrid(Grid):
         corners = corners.transpose()
         return corners
 
-    def _place_ligand_crd_in_grid(self, molecular_coord):
+    def _place_ligand_crd_in_grid(self, molecular_coord):          #3
         """
         molecular_coord:    2-array, new liagnd coordinate
         """
@@ -403,7 +403,7 @@ class LigGrid(Grid):
         self._move_ligand_to_lower_corner()
         return None
 
-    def cal_grids(self, molecular_coord=None):
+    def cal_grids(self, molecular_coord=None):       #8
         """
         molecular_coord:    2-array, new liagnd coordinate
         compute charge grids, meaningful_energies, meaningful_corners for molecular_coord
@@ -438,10 +438,10 @@ class LigGrid(Grid):
         correction = -temperature * kB * np.log(V_binding / V_0 / 8 / np.pi**2)
         return bpmf + correction
     
-    def get_number_translations(self): 
+    def get_number_translations(self):        #15
         return self._max_grid_indices.prod()
     
-    def get_box_volume(self):
+    def get_box_volume(self):      #14
         """
         in angstrom ** 3
         """
@@ -449,20 +449,20 @@ class LigGrid(Grid):
         volume = ((self._max_grid_indices - 1) * spacing).prod()
         return volume
     
-    def get_meaningful_energies(self):
+    def get_meaningful_energies(self):               #9
         return self._meaningful_energies
     
-    def get_meaningful_corners(self):
+    def get_meaningful_corners(self):     #12
         meaningful_corners = self._cal_meaningful_corners()
         if meaningful_corners.shape[0] != self._number_of_meaningful_energies:
             raise RuntimeError("meaningful_corners does not have the same len as self._number_of_meaningful_energies")
         return meaningful_corners
 
-    def set_meaningful_energies_to_none(self):
+    def set_meaningful_energies_to_none(self):    #10
         self._meaningful_energies = None
         return None
 
-    def get_initial_com(self):
+    def get_initial_com(self):    #13  
         return self._initial_com
 
 
@@ -476,7 +476,7 @@ class RecGrid(Grid):
                         bsite_file,
                         grid_nc_file,
                         new_calculation=False,
-                        spacing=0.25, extra_buffer=3.0):
+                        spacing=0.25, extra_buffer=3.0):                       #   3
         """
         :param prmtop_file_name: str, name of AMBER prmtop file
         :param lj_sigma_scaling_factor: float
@@ -516,10 +516,9 @@ class RecGrid(Grid):
             nc_handle.close()
          
         self._load_precomputed_grids(grid_nc_file, lj_sigma_scaling_factor)
-        print("************inside __init__") # debug
       
 
-    def _load_precomputed_grids(self, grid_nc_file, lj_sigma_scaling_factor):
+    def _load_precomputed_grids(self, grid_nc_file, lj_sigma_scaling_factor):   # 2
         """
         nc_file_name:   str
         lj_sigma_scaling_factor: float, used for consistency check
@@ -549,15 +548,13 @@ class RecGrid(Grid):
             self._set_grid_key_value(key, None)     # to save memory
 
         nc_handle.close()
-        print("************inside _load_precomputed_grids") # debug
         return None
 
-    def _cal_FFT(self, name):
+    def _cal_FFT(self, name):                  # 1
         if name not in self._grid_func_names:
             raise RuntimeError("%s is not allowed.")
         print("Doing FFT for %s"%name)
         FFT = np.fft.fftn(self._grid[name])
-        print("************inside _cal_FFT") # debug
         return FFT
 
     def _write_to_nc(self, nc_handle, key, value):
@@ -580,7 +577,6 @@ class RecGrid(Grid):
 
         # save data
         nc_handle.variables[key][:] = value
-        print("************inside _write_to_nc") # debug
         return None
 
     def _cal_grid_parameters_with_bsite(self, spacing, bsite_file, nc_handle):
@@ -607,7 +603,6 @@ class RecGrid(Grid):
 
         for key in ["origin", "d0", "d1", "d2", "spacing", "counts"]:
             self._write_to_nc(nc_handle, key, self._grid[key])
-        print("************inside _cal_grid_parameters_with_bsite") # debug
         return None
     
     def _cal_grid_parameters_without_bsite(self, spacing, extra_buffer, nc_handle):
@@ -641,7 +636,6 @@ class RecGrid(Grid):
 
         for key in ["origin", "d0", "d1", "d2", "spacing", "counts"]:
             self._write_to_nc(nc_handle, key, self._grid[key])
-        print("************inside _cal_grid_parameters_without_bsite") # debug
         return None
     
     def _move_receptor_to_grid_center(self):
@@ -659,7 +653,6 @@ class RecGrid(Grid):
 
         for atom_ind in range(len(self._crd)):
             self._crd[atom_ind] += displacement
-        print("************inside _move_receptor_to_grid_center") # debug
         return None
     
     def _cal_grid_coordinates(self, nc_handle):
@@ -688,10 +681,9 @@ class RecGrid(Grid):
 
         for key in ["x", "y", "z"]:
             self._write_to_nc(nc_handle, key, self._grid[key])
-        print("************inside _cal_grid_coordinates") # debug
         return None
 
-    def _get_charges(self, name):
+    def _get_charges(self, name):                #4
         assert name in self._grid_func_names, "%s is not allowed"%name
 
         if name == "electrostatic":
@@ -704,8 +696,6 @@ class RecGrid(Grid):
             return np.array([0], dtype=float)
         else:
             raise RuntimeError("%s is unknown"%name)
-        print("************inside _get_charges") # debug
-        return None
 
     def _cal_potential_grids(self, nc_handle):
         """
@@ -723,7 +713,6 @@ class RecGrid(Grid):
             self._write_to_nc(nc_handle, name, grid)
             self._set_grid_key_value(name, grid)
             #self._set_grid_key_value(name, None)     # to save memory
-        print("************inside _cal_potential_grids") # debug
         return None
     
     def _exact_values(self, coordinate):
@@ -751,7 +740,6 @@ class RecGrid(Grid):
                 values["LJr"] +=  self._prmtop["R_LJ_CHARGE"][atom_ind] / R**12
                 values["LJa"] += -2. * self._prmtop["A_LJ_CHARGE"][atom_ind] / R**6
         
-        print("************inside _exact_values") # debug
         return values
     
     def _trilinear_interpolation( self, grid_name, coordinate ):
@@ -783,7 +771,6 @@ class RecGrid(Grid):
         c1 = c01*(1. - yd) + c11*yd
         
         c = c0*(1. - zd) + c1*zd
-        print("************inside _trilinear_interpolation") # debug
         return c
     
     def direct_energy(self, ligand_coordinate, ligand_charges):
@@ -799,7 +786,6 @@ class RecGrid(Grid):
             energy += potentials["electrostatic"]*ligand_charges["CHARGE_E_UNIT"][atom_ind]
             energy += potentials["LJr"]*ligand_charges["R_LJ_CHARGE"][atom_ind]
             energy += potentials["LJa"]*ligand_charges["A_LJ_CHARGE"][atom_ind]
-        print("************inside direct_energy") # debug
         return energy
     
     def interpolated_energy(self, ligand_coordinate, ligand_charges):
@@ -821,21 +807,17 @@ class RecGrid(Grid):
             energy += potentials["LJr"]*ligand_charges["R_LJ_CHARGE"][atom_ind]
             energy += potentials["LJa"]*ligand_charges["A_LJ_CHARGE"][atom_ind]
         
-        print("************inside interpolated_energy") # debug
         return energy
 
-    def get_FFTs(self):
-        print("************inside get_FFTs") # debug
+    def get_FFTs(self):                     # 4
         return self._FFTs
 
     def write_box(self, file_name):
         IO.write_box(self, file_name)
-        print("************inside write_box") # debug
         return None
 
     def write_pdb(self, file_name, mode):
         IO.write_pdb(self._prmtop, self._crd, file_name, mode)
-        print("************inside write_pdb") # debug
         return None
 
 
