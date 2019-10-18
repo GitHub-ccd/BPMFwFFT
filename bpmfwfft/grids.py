@@ -253,9 +253,9 @@ class LigGrid(Grid):
         if np.any(self._max_grid_indices <= 1):
             raise RuntimeError("At least one of the max grid indices is <= one")
         
-        #displacement = self._origin_crd - lower_ligand_corner
-        #for atom_ind in range(len(self._crd)):
-            #self._crd[atom_ind] += displacement
+        displacement = self._origin_crd - lower_ligand_corner
+        for atom_ind in range(len(self._crd)):
+            self._crd[atom_ind] += displacement
         
         self._initial_com = self._get_molecule_center_of_mass()
         return None
@@ -276,6 +276,9 @@ class LigGrid(Grid):
 
     def _cal_charge_grid(self, name):
         charges = self._get_charges(name)
+        # This Debug
+        sys.exit(print("\n ***debug self._eight_corner_shifts: ", self._eight_corner_shifts ,\
+        "\n ***debug self._grid-x: ", len(self._grid["x"]),  "\n***debug***"))
         grid = c_cal_charge_grid(name, self._crd, charges, self._origin_crd, 
                                 self._uper_most_corner_crd, self._uper_most_corner,
                                 self._grid["spacing"], self._eight_corner_shifts, self._six_corner_shifts,
@@ -335,8 +338,6 @@ class LigGrid(Grid):
         TODO
         """
         max_i, max_j, max_k = self._max_grid_indices # max_i, max_j, max_k = [250 228 240]
-        # This Debug
-        #sys.exit(print("\n ***debug self._max_grid_indices: ", self._max_grid_indices , "\n***debug***"))
 
         corr_func = self._cal_corr_func("occupancy")
         self._free_of_clash = (corr_func  < 0.001)
