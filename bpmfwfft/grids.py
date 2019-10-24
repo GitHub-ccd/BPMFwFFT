@@ -48,7 +48,6 @@ class Grid(object):
 
         self._eight_corner_shifts = [np.array([i,j,k], dtype=int) for i in range(2) for j in range(2) for k in range(2)]
         self._eight_corner_shifts = np.array(self._eight_corner_shifts, dtype=int)
-
         self._six_corner_shifts = self._get_six_corner_shifts()
 
 
@@ -205,7 +204,7 @@ class LigGrid(Grid):
     Calculate the "charge" part of the interaction energy.
     """
     def __init__(self, prmtop_file_name, lj_sigma_scaling_factor, 
-                       inpcrd_file_name, receptor_grid):
+                       inpcrd_file_name, receptor_grid):                  #1
         
         """
         :param prmtop_file_name: str, name of AMBER prmtop file
@@ -231,7 +230,8 @@ class LigGrid(Grid):
         self._load_inpcrd(inpcrd_file_name)
         self._move_ligand_to_lower_corner()
         
-    def _move_ligand_to_lower_corner(self):
+        
+    def _move_ligand_to_lower_corner(self):        #2 
         """
         move ligand to near the grid lower corner 
         store self._max_grid_indices and self._initial_com
@@ -253,16 +253,15 @@ class LigGrid(Grid):
         if np.any(self._max_grid_indices <= 1):
             raise RuntimeError("At least one of the max grid indices is <= one")
         
-        #displacement = self._origin_crd - lower_ligand_corner
-        #for atom_ind in range(len(self._crd)):
-            #self._crd[atom_ind] += displacement
+        displacement = self._origin_crd - lower_ligand_corner
+        for atom_ind in range(len(self._crd)):
+            self._crd[atom_ind] += displacement
         
         self._initial_com = self._get_molecule_center_of_mass()
         return None
     
     def _get_charges(self, name):
         assert name in self._grid_func_names, "%s is not allowed"%name
-
         if name == "electrostatic":
             return np.array(self._prmtop["CHARGE_E_UNIT"], dtype=float)
         elif name == "LJa":
@@ -274,15 +273,18 @@ class LigGrid(Grid):
         else:
             raise RuntimeError("%s is unknown"%name)
 
-    def _cal_charge_grid(self, name):
+    def _cal_charge_grid(self, name):          #5 
         charges = self._get_charges(name)
+        # This Debug
+        #sys.exit(print("\n ***debug self._eight_corner_shifts: ", self._eight_corner_shifts ,\
+        #"\n ***debug self._grid-x: ", len(self._grid["x"]),  "\n***debug***"))
         grid = c_cal_charge_grid(name, self._crd, charges, self._origin_crd, 
                                 self._uper_most_corner_crd, self._uper_most_corner,
                                 self._grid["spacing"], self._eight_corner_shifts, self._six_corner_shifts,
                                 self._grid["x"], self._grid["y"], self._grid["z"])
         return grid
 
-    def _cal_corr_func(self, grid_name):
+    def _cal_corr_func(self, grid_name):                         #6
         """
         :param grid_name: str
         :return: fft correlation function
@@ -327,7 +329,7 @@ class LigGrid(Grid):
         corr_func = np.real(corr_func)
         return corr_func
 
-    def _cal_energies(self):
+    def _cal_energies(self):     #7
         """
         calculate interaction energies
         store self._meaningful_energies (1-array) and self._meaningful_corners (2-array)
@@ -335,8 +337,6 @@ class LigGrid(Grid):
         TODO
         """
         max_i, max_j, max_k = self._max_grid_indices # max_i, max_j, max_k = [250 228 240]
-        # This Debug
-        #sys.exit(print("\n ***debug self._max_grid_indices: ", self._max_grid_indices , "\n***debug***"))
 
         corr_func = self._cal_corr_func("occupancy")
         self._free_of_clash = (corr_func  < 0.001)
@@ -382,7 +382,7 @@ class LigGrid(Grid):
         self._number_of_meaningful_energies = self._meaningful_energies.shape[0]
         return None
     
-    def _cal_meaningful_corners(self):
+    def _cal_meaningful_corners(self):   #11
         """
         return grid corners corresponding to self._meaningful_energies
         """
@@ -391,7 +391,7 @@ class LigGrid(Grid):
         corners = corners.transpose()
         return corners
 
-    def _place_ligand_crd_in_grid(self, molecular_coord):
+    def _place_ligand_crd_in_grid(self, molecular_coord):          #3
         """
         molecular_coord:    2-array, new liagnd coordinate
         """
@@ -403,7 +403,7 @@ class LigGrid(Grid):
         self._move_ligand_to_lower_corner()
         return None
 
-    def cal_grids(self, molecular_coord=None):
+    def cal_grids(self, molecular_coord=None):       #8
         """
         molecular_coord:    2-array, new liagnd coordinate
         compute charge grids, meaningful_energies, meaningful_corners for molecular_coord
@@ -438,10 +438,10 @@ class LigGrid(Grid):
         correction = -temperature * kB * np.log(V_binding / V_0 / 8 / np.pi**2)
         return bpmf + correction
     
-    def get_number_translations(self): 
+    def get_number_translations(self):        #15
         return self._max_grid_indices.prod()
     
-    def get_box_volume(self):
+    def get_box_volume(self):      #14
         """
         in angstrom ** 3
         """
@@ -449,20 +449,20 @@ class LigGrid(Grid):
         volume = ((self._max_grid_indices - 1) * spacing).prod()
         return volume
     
-    def get_meaningful_energies(self):
+    def get_meaningful_energies(self):               #9
         return self._meaningful_energies
     
-    def get_meaningful_corners(self):
+    def get_meaningful_corners(self):     #12
         meaningful_corners = self._cal_meaningful_corners()
         if meaningful_corners.shape[0] != self._number_of_meaningful_energies:
             raise RuntimeError("meaningful_corners does not have the same len as self._number_of_meaningful_energies")
         return meaningful_corners
 
-    def set_meaningful_energies_to_none(self):
+    def set_meaningful_energies_to_none(self):    #10
         self._meaningful_energies = None
         return None
 
-    def get_initial_com(self):
+    def get_initial_com(self):    #13  
         return self._initial_com
 
 
@@ -476,7 +476,7 @@ class RecGrid(Grid):
                         bsite_file,
                         grid_nc_file,
                         new_calculation=False,
-                        spacing=0.25, extra_buffer=3.0):
+                        spacing=0.25, extra_buffer=3.0):                       #   3
         """
         :param prmtop_file_name: str, name of AMBER prmtop file
         :param lj_sigma_scaling_factor: float
@@ -518,7 +518,7 @@ class RecGrid(Grid):
         self._load_precomputed_grids(grid_nc_file, lj_sigma_scaling_factor)
       
 
-    def _load_precomputed_grids(self, grid_nc_file, lj_sigma_scaling_factor):
+    def _load_precomputed_grids(self, grid_nc_file, lj_sigma_scaling_factor):   # 2
         """
         nc_file_name:   str
         lj_sigma_scaling_factor: float, used for consistency check
@@ -550,7 +550,7 @@ class RecGrid(Grid):
         nc_handle.close()
         return None
 
-    def _cal_FFT(self, name):
+    def _cal_FFT(self, name):                  # 1
         if name not in self._grid_func_names:
             raise RuntimeError("%s is not allowed.")
         print("Doing FFT for %s"%name)
@@ -683,7 +683,7 @@ class RecGrid(Grid):
             self._write_to_nc(nc_handle, key, self._grid[key])
         return None
 
-    def _get_charges(self, name):
+    def _get_charges(self, name):                #4
         assert name in self._grid_func_names, "%s is not allowed"%name
 
         if name == "electrostatic":
@@ -809,7 +809,7 @@ class RecGrid(Grid):
         
         return energy
 
-    def get_FFTs(self):
+    def get_FFTs(self):                     # 4
         return self._FFTs
 
     def write_box(self, file_name):
