@@ -293,7 +293,7 @@ class LigGrid(Grid):
         grid = self._cal_charge_grid(grid_name)
 
         self._set_grid_key_value(grid_name, grid)
-        corr_func = np.fft.fftn(self._grid[grid_name])   # corr_func.shape = 338,338,338
+        corr_func = np.fft.fftn(self._grid[grid_name])   # corr_func.shape and _grid[grid_name]= 338,338,338
 
         self._set_grid_key_value(grid_name, None)           # to save memory
 

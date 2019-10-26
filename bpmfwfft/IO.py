@@ -3,6 +3,7 @@
 from __future__ import print_function
 
 import os
+import sys
 
 import numpy as np
 import netCDF4
@@ -224,7 +225,6 @@ class InpcrdLoad(object):
         :param inpcrd_file_name: str, name of AMBER coordinate file
         """
         assert os.path.isfile(inpcrd_file_name), "%s does not exist" %inpcrd_file_name
-        
         if inpcrd_file_name[-3:] == ".gz":
             import gzip
             inpcrd_file = gzip.open(inpcrd_file_name, "r")

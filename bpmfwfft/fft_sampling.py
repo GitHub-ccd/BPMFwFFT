@@ -6,6 +6,7 @@ from __future__ import print_function
 
 import numpy as np
 import netCDF4
+import sys
 
 from grids import RecGrid
 from grids import LigGrid
@@ -158,6 +159,7 @@ class Sampling(object):
         lig_conf = self._lig_coord_ensemble[step]
         self._lig_grid.cal_grids(molecular_coord = lig_conf)
 
+
         energies = self._lig_grid.get_meaningful_energies()
         self._mean_energy = energies.mean()
         self._min_energy  = energies.min()
@@ -177,6 +179,8 @@ class Sampling(object):
         self._lig_grid.set_meaningful_energies_to_none()
 
         trans_vectors = self._lig_grid.get_meaningful_corners()
+        # This Debug
+        sys.exit(print("\n ***trans_vectors****", trans_vectors, "\n **** shape *** \n", trans_vectors.shape))
         self._resampled_trans_vectors = [trans_vectors[ind] for ind in sel_ind]
         del trans_vectors
 
