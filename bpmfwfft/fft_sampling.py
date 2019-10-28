@@ -48,6 +48,9 @@ class Sampling(object):
 
         self._lig_coord_ensemble = self._load_ligand_coor_ensemble(lig_coord_ensemble)
 
+        # This Debug
+        #sys.exit(print("\n ***rec_prmtop****", rec_prmtop, "\n **** lig_prmtop *** \n", lig_prmtop))
+
         self._nc_handle = self._initialize_nc(output_nc)
 
     def _create_rec_grid(self, rec_prmtop, lj_sigma_scal_fact, rec_inpcrd, bsite_file, grid_nc_file):
@@ -171,17 +174,33 @@ class Sampling(object):
         exp_energies = np.exp(exp_energies - self._log_of_divisor)
         self._exponential_sum = exp_energies.sum()
         exp_energies /= self._exponential_sum
-        sel_ind = np.random.choice(exp_energies.shape[0], size=self._energy_sample_size_per_ligand, p=exp_energies, replace=False)
+        #sel_ind = np.random.choice(exp_energies.shape[0], size=self._energy_sample_size_per_ligand, p=exp_energies, replace=False)
         del exp_energies
 
-        self._resampled_energies = [energies[ind] for ind in sel_ind]
-        del energies
-        self._lig_grid.set_meaningful_energies_to_none()
-
+        #self._resampled_energies = [energies[ind] for ind in sel_ind]
+        
         trans_vectors = self._lig_grid.get_meaningful_corners()
+        d=[34.55264071,  -8.02404939, -10.32889024]
+        d_length= np.sqrt(((d[0])**2)+((d[1])**2)+((d[2])**2))
+        s=0.5
+        s=s*np.sqrt(3.0)
+        low=d_length-s
+        high=d_length+s
+        self._resampled_trans_vectors= []
+        self._resampled_energies= []
+        for i in range(energies.shape[0]):
+            trans_v_length=np.sqrt(((s*trans_vectors[i][0])**2)+((s*trans_vectors[i][1])**2)+((s*trans_vectors[i][2])**2))
+            if (trans_v_length >= low) and (trans_v_length <= high):
+                print("energy ", energies[i],"trans_vectors", trans_vectors[i])
+                self._resampled_trans_vectors.append(trans_vectors[i])
+                self._resampled_energies.append(energies[i])
+                    
+        self._lig_grid.set_meaningful_energies_to_none()
+        del energies
+
         # This Debug
-        sys.exit(print("\n ***trans_vectors****", trans_vectors, "\n **** shape *** \n", trans_vectors.shape))
-        self._resampled_trans_vectors = [trans_vectors[ind] for ind in sel_ind]
+        #sys.exit(print("\n ***self._resampled_trans_vectors:\n", self._resampled_trans_vectors, "\n length", len(self._resampled_trans_vectors)))
+        #self._resampled_trans_vectors = [trans_vectors[ind] for ind in sel_ind]
         del trans_vectors
 
         self._resampled_energies = np.array(self._resampled_energies, dtype=float)
