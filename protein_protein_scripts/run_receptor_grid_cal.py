@@ -101,7 +101,8 @@ python ''' + this_script + \
                                                                 os.path.join(out_dir, GRID_NC)): 
             print("Submitting %s"%complex)
             open(qsub_file, "w").write(qsub_script)
-            os.system("qsub %s" %qsub_file)
+            #os.system("qsub %s" %qsub_file)
+            os.system("bash %s" %qsub_file)
             job_count += 1
             if job_count == max_jobs:
                 print("Max number of jobs %d reached."%job_count)

@@ -32,12 +32,12 @@ if __name__ == "__main__":
     inpcrd_file_name="/home/chamila/test-3/2.redock/1.amber/1A2K_C:AB/ligand.inpcrd"
     prmtop_file_name="/home/chamila/test-3/2.redock/1.amber/1A2K_C:AB/ligand.prmtop"
     Lig_R=center_of_mass(inpcrd_file_name, prmtop_file_name)
-    print("Ligan x, y, z =", Lig_R[0], Lig_R[1], Lig_R[2])
+    print("Lig center of mass=", Lig_R)
     
     inpcrd_file_name="/home/chamila/test-3/2.redock/1.amber/1A2K_C:AB/receptor.inpcrd"
     prmtop_file_name="/home/chamila/test-3/2.redock/1.amber/1A2K_C:AB/receptor.prmtop"
     Rec_R=center_of_mass(inpcrd_file_name, prmtop_file_name)
-    print("receptor x, y, z  =", Rec_R[0], Rec_R[1], Rec_R[2])
+    print("Rec center of mass=", Rec_R)
     
     r_magnitude= np.sqrt(((Lig_R[0]-Rec_R[0])**2)+((Lig_R[1]-Rec_R[1])**2)+((Lig_R[2]-Rec_R[2])**2))
     print("displacement magnitude  =", r_magnitude)
@@ -45,10 +45,7 @@ if __name__ == "__main__":
     
     print("displacement vector (x,y,z)=", (Lig_R - Rec_R) )
     
-    tv=np.ones([10,3], dtype=float)
-    #tv=np.random.rand(3,10)
-    spacing=0.5
-    print(" testing ******",tv*spacing)
+
     
     #print('Trans vectors are:', '\n'.join([str(lst) for lst in range(10)]))
     
