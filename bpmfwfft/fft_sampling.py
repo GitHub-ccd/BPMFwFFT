@@ -8,6 +8,7 @@ import numpy as np
 import netCDF4
 import sys
 
+import IO
 from grids import RecGrid
 from grids import LigGrid
 
@@ -16,6 +17,8 @@ KB = 0.001987204134799235
 
 
 class Sampling(object):
+    Grid_displacement = []
+    
     def __init__(self, rec_prmtop, lj_sigma_scal_fact, rec_inpcrd, 
                         bsite_file, grid_nc_file,
                         lig_prmtop, lig_inpcrd,
@@ -49,9 +52,41 @@ class Sampling(object):
         self._lig_coord_ensemble = self._load_ligand_coor_ensemble(lig_coord_ensemble)
 
         # This Debug
-        #sys.exit(print("\n ***rec_prmtop****", rec_prmtop, "\n **** lig_prmtop *** \n", lig_prmtop))
+        #print("\n Rec origin :", rec_grid._grid['origin'])
+        #print("\n Rec spacing :", rec_grid._grid['spacing'][0])
+        #print("\n Rec upper most corner :", rec_grid._uper_most_corner_crd)
+        #print("\n Lig origin :",  rec_grid._origin_crd)
+        #print("\n Lig upper most corner :",  rec_grid._uper_most_corner_crd)
+        #Calculate native displcaement 
+        Lig_R=self.center_of_mass(lig_inpcrd, lig_prmtop)
+        Rec_R=self.center_of_mass(rec_inpcrd, rec_prmtop)
+        Native_displacement=(Lig_R - Rec_R)
+        #print("\n ***Native Displacement vector**** =", Native_displacement)
+        grid_center = (rec_grid._origin_crd + rec_grid._uper_most_corner_crd) / 2.
+        self.Grid_displacement = Native_displacement/rec_grid._grid['spacing'][0]
+        self.Grid_displacement = np.round(self.Grid_displacement)
+        self.Grid_displacement = np.round(grid_center+self.Grid_displacement)
 
         self._nc_handle = self._initialize_nc(output_nc)
+
+    def center_of_mass(self, inpcrd_file_name, prmtop_file_name):
+        """
+        return the center of mass of self._crd
+        """
+        prmtop = dict()
+        prmtop = IO.PrmtopLoad(prmtop_file_name).get_parm_for_grid_calculation()
+        com = np.zeros([3], dtype=float)
+        masses = prmtop["MASS"]
+        crd_temp = IO.InpcrdLoad(inpcrd_file_name).get_coordinates()
+        natoms = prmtop["POINTERS"]["NATOM"]
+        if (crd_temp.shape[0] != natoms) or (crd_temp.shape[1] != 3):
+            raise RuntimeError("coordinates in %s has wrong shape"%inpcrd_file_name)
+        for atom_ind in range(len(crd_temp)):
+            com += masses[atom_ind] * crd_temp[atom_ind]
+        total_mass = masses.sum()
+        if total_mass == 0:
+            raise RuntimeError("zero total mass")
+        return com / total_mass
 
     def _create_rec_grid(self, rec_prmtop, lj_sigma_scal_fact, rec_inpcrd, bsite_file, grid_nc_file):
         rec_grid = RecGrid(rec_prmtop, lj_sigma_scal_fact, rec_inpcrd, bsite_file, 
@@ -178,29 +213,23 @@ class Sampling(object):
         del exp_energies
 
         #self._resampled_energies = [energies[ind] for ind in sel_ind]
-        
-        trans_vectors = self._lig_grid.get_meaningful_corners()
-        d=[34.55264071,  -8.02404939, -10.32889024]
-        d_length= np.sqrt(((d[0])**2)+((d[1])**2)+((d[2])**2))
-        s=0.5
-        s=s*np.sqrt(3.0)
-        low=d_length-s
-        high=d_length+s
-        self._resampled_trans_vectors= []
-        self._resampled_energies= []
-        for i in range(energies.shape[0]):
-            trans_v_length=np.sqrt(((s*trans_vectors[i][0])**2)+((s*trans_vectors[i][1])**2)+((s*trans_vectors[i][2])**2))
-            if (trans_v_length >= low) and (trans_v_length <= high):
-                print("energy ", energies[i],"trans_vectors", trans_vectors[i])
-                self._resampled_trans_vectors.append(trans_vectors[i])
-                self._resampled_energies.append(energies[i])
-                    
         self._lig_grid.set_meaningful_energies_to_none()
-        del energies
+        trans_vectors = self._lig_grid.get_meaningful_corners()       
+        
+        print("******Grid_displacement", self.Grid_displacement)
+        
+        for i in range(energies.shape[0]):
+            if trans_vectors[i][0] == self.Grid_displacement[0] and trans_vectors[i][1] == self.Grid_displacement[1] and trans_vectors[i][2] == self.Grid_displacement[2]:
+                print("The Native Pose energy ", energies[i],"\n trans_vectors", trans_vectors[i])
+
 
         # This Debug
-        #sys.exit(print("\n ***self._resampled_trans_vectors:\n", self._resampled_trans_vectors, "\n length", len(self._resampled_trans_vectors)))
+        print("\n ***energies:\n", energies, "\n length", len(energies))
+        sys.exit(print("\n ***trans_vectors:\n", trans_vectors, "\n length", len(trans_vectors)))                    
+        
+
         #self._resampled_trans_vectors = [trans_vectors[ind] for ind in sel_ind]
+        del energies
         del trans_vectors
 
         self._resampled_energies = np.array(self._resampled_energies, dtype=float)

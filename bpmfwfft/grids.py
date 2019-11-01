@@ -649,11 +649,11 @@ class RecGrid(Grid):
         grid_center = (self._origin_crd + self._uper_most_corner_crd) / 2.
         displacement = grid_center - receptor_box_center
         # This Debug
-        print("\n ***self._origin_crd: ", self._origin_crd)
-        print("\n ***self._uper_most_corner_crd: ", self._uper_most_corner_crd)
-        print("\n ***receptor_box_center: ", receptor_box_center)
-        print("\n ***grid_center: ", grid_center)
-        sys.exit(print("\n ***debug displacement: ", displacement))
+        #print("\n ***self._origin_crd: ", self._origin_crd)
+        #print("\n ***self._uper_most_corner_crd: ", self._uper_most_corner_crd)
+        #print("\n ***receptor_box_center: ", receptor_box_center)
+        #print("\n ***grid_center: ", grid_center)
+        #sys.exit(print("\n ***debug displacement: ", displacement))
 
         print("Receptor is translated by ", displacement)
 

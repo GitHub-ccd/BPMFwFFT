@@ -27,23 +27,27 @@ def center_of_mass(inpcrd_file_name, prmtop_file_name):
         raise RuntimeError("zero total mass")
     return center_of_mass / total_mass
 
+def displacement(Rec_prmtop, Rec_crd, Lig_prmtop, Lig_crd):
+    Lig_R=center_of_mass(Lig_crd, Lig_prmtop)
+    Rec_R=center_of_mass(Rec_crd, Rec_prmtop)
+    return (Lig_R - Rec_R)
 
 if __name__ == "__main__":
-    inpcrd_file_name="/home/chamila/test-3/2.redock/1.amber/1A2K_C:AB/ligand.inpcrd"
-    prmtop_file_name="/home/chamila/test-3/2.redock/1.amber/1A2K_C:AB/ligand.prmtop"
-    Lig_R=center_of_mass(inpcrd_file_name, prmtop_file_name)
+    Lig_crd="/home/chamila/test-3/2.redock/1.amber/1A2K_C:AB/ligand.inpcrd"
+    Lig_prmtop="/home/chamila/test-3/2.redock/1.amber/1A2K_C:AB/ligand.prmtop"
+    Lig_R=center_of_mass(Lig_crd, Lig_prmtop)
     print("Lig center of mass=", Lig_R)
-    
-    inpcrd_file_name="/home/chamila/test-3/2.redock/1.amber/1A2K_C:AB/receptor.inpcrd"
-    prmtop_file_name="/home/chamila/test-3/2.redock/1.amber/1A2K_C:AB/receptor.prmtop"
-    Rec_R=center_of_mass(inpcrd_file_name, prmtop_file_name)
+
+    Rec_crd="/home/chamila/test-3/2.redock/1.amber/1A2K_C:AB/receptor.inpcrd"
+    Rec_prmtop="/home/chamila/test-3/2.redock/1.amber/1A2K_C:AB/receptor.prmtop"
+    Rec_R=center_of_mass(Rec_crd, Rec_prmtop)
     print("Rec center of mass=", Rec_R)
+
+
+    Native_displacement = displacement(Rec_prmtop, Rec_crd, Lig_prmtop, Lig_crd)
+
     
-    r_magnitude= np.sqrt(((Lig_R[0]-Rec_R[0])**2)+((Lig_R[1]-Rec_R[1])**2)+((Lig_R[2]-Rec_R[2])**2))
-    print("displacement magnitude  =", r_magnitude)
-    print("displacement direction  unit(x,y,z)=", ((Lig_R[0]-Rec_R[0])/r_magnitude), ((Lig_R[1]-Rec_R[1])/r_magnitude), ((Lig_R[2]-Rec_R[2])/r_magnitude))
-    
-    print("displacement vector (x,y,z)=", (Lig_R - Rec_R) )
+    print("displacement vector (x,y,z)=", Native_displacement )
     
 
     
