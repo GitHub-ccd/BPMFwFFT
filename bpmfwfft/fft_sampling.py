@@ -217,9 +217,15 @@ class Sampling(object):
         trans_vectors = self._lig_grid.get_meaningful_corners()       
         
         print("******Grid_displacement", self.Grid_displacement)
-        
+        x=int(self.Grid_displacement[0])
+        y=int(self.Grid_displacement[1])
+        z=int(self.Grid_displacement[2])
+        print("**** convert to intergers x, y, z:", x,y,z)
         for i in range(energies.shape[0]):
-            if trans_vectors[i][0] == self.Grid_displacement[0] and trans_vectors[i][1] == self.Grid_displacement[1] and trans_vectors[i][2] == self.Grid_displacement[2]:
+            if (trans_vectors[i][0] ==  153) and (trans_vectors[i][1] == 68) and (trans_vectors[i][2] == 63):
+                print("**** AT least this x, y, z:",trans_vectors[i][0], trans_vectors[i][1], trans_vectors[i][2])
+            if (trans_vectors[i][0] ==  x) and (trans_vectors[i][1] == y) and (trans_vectors[i][2] == z):
+                print("**** trans_vectors x, y, z:",trans_vectors[i][0], trans_vectors[i][1], trans_vectors[i][2])
                 print("The Native Pose energy ", energies[i],"\n trans_vectors", trans_vectors[i])
 
 
