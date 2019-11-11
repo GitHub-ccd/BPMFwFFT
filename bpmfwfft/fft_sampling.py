@@ -18,6 +18,7 @@ KB = 0.001987204134799235
 
 class Sampling(object):
     Grid_displacement = []
+    initial_com = []
     
     def __init__(self, rec_prmtop, lj_sigma_scal_fact, rec_inpcrd, 
                         bsite_file, grid_nc_file,
@@ -51,17 +52,13 @@ class Sampling(object):
 
         self._lig_coord_ensemble = self._load_ligand_coor_ensemble(lig_coord_ensemble)
 
-        # This Debug
-        #print("\n Rec origin :", rec_grid._grid['origin'])
-        #print("\n Rec spacing :", rec_grid._grid['spacing'][0])
-        #print("\n Rec upper most corner :", rec_grid._uper_most_corner_crd)
-        #print("\n Lig origin :",  rec_grid._origin_crd)
-        #print("\n Lig upper most corner :",  rec_grid._uper_most_corner_crd)
-        #Calculate native displcaement 
         Lig_R=self.center_of_mass(lig_inpcrd, lig_prmtop)
+        print("\n********Native Lig center of mass :",Lig_R)
+        self.initial_com=self._lig_grid.get_initial_com()
+        print("\n ******Lig COM after move to corner:",self.initial_com)
         Rec_R=self.center_of_mass(rec_inpcrd, rec_prmtop)
+        print("\n********Native Rec center of mass :",Rec_R)
         Native_displacement=(Lig_R - Rec_R)
-        #print("\n ***Native Displacement vector**** =", Native_displacement)
         grid_center = (rec_grid._origin_crd + rec_grid._uper_most_corner_crd) / 2.
         self.Grid_displacement = Native_displacement/rec_grid._grid['spacing'][0]
         self.Grid_displacement = np.round(self.Grid_displacement)
@@ -212,7 +209,7 @@ class Sampling(object):
         #sel_ind = np.random.choice(exp_energies.shape[0], size=self._energy_sample_size_per_ligand, p=exp_energies, replace=False)
         del exp_energies
 
-        #self._resampled_energies = [energies[ind] for ind in sel_ind]
+        
         self._lig_grid.set_meaningful_energies_to_none()
         trans_vectors = self._lig_grid.get_meaningful_corners()       
         
@@ -221,20 +218,41 @@ class Sampling(object):
         y=int(self.Grid_displacement[1])
         z=int(self.Grid_displacement[2])
         print("**** convert to intergers x, y, z:", x,y,z)
+        print("\n ******Lig COM after move to corner:",self.initial_com)
+        num_native=0
+        sel_ind= []
         for i in range(energies.shape[0]):
-            if (trans_vectors[i][0] ==  153) and (trans_vectors[i][1] == 68) and (trans_vectors[i][2] == 63):
-                print("**** AT least this x, y, z:",trans_vectors[i][0], trans_vectors[i][1], trans_vectors[i][2])
-            if (trans_vectors[i][0] ==  x) and (trans_vectors[i][1] == y) and (trans_vectors[i][2] == z):
+            if (trans_vectors[i][0] ==  107) and (trans_vectors[i][1] == 18) and (trans_vectors[i][2] == 8):
+                num_native=i
+                sel_ind = np.append(sel_ind, i)
+                r=np.sqrt((trans_vectors[i][0]**2)+(trans_vectors[i][1]**2)+(trans_vectors[i][2]**2)) 
                 print("**** trans_vectors x, y, z:",trans_vectors[i][0], trans_vectors[i][1], trans_vectors[i][2])
-                print("The Native Pose energy ", energies[i],"\n trans_vectors", trans_vectors[i])
+                print("The Native Pose energy ", energies[i]," trans_vectors", trans_vectors[i])
+                print("The Native Pose \n ", energies[i], r)
+        #decoys
+        l=0; m=0; n=0;
+        for i in range(energies.shape[0]):
+            if (float(energies[i]) >  -225.5) and (float(energies[i]) < -225.0) : l+=1
+                #print("\n Decoy energy ", energies[i],"Decoy trans_vectors", trans_vectors[i])
+            if (float(energies[i]) >  -225.4) and (float(energies[i]) < -225.1) : m+=1
+            if (float(energies[i]) >  -225.2995) and (float(energies[i]) < -225.2985) : 
+                n+=1
+                sel_ind = np.append(sel_ind, i)
+                r=np.sqrt((trans_vectors[i][0]**2)+(trans_vectors[i][1]**2)+(trans_vectors[i][2]**2)) 
+                print(energies[i], r)
 
+        print("\n what's left of sel_ind : ",self._energy_sample_size_per_ligand-len(sel_ind))
+        for i in range(len(sel_ind),self._energy_sample_size_per_ligand):
+            sel_ind = np.append(sel_ind, num_native)
+        print("\n new length of  sel_ind : ", len(sel_ind))
+        print("\n Decoy energy window l, m, n = ", l, m, n)
 
         # This Debug
-        print("\n ***energies:\n", energies, "\n length", len(energies))
-        sys.exit(print("\n ***trans_vectors:\n", trans_vectors, "\n length", len(trans_vectors)))                    
+        #print("\n ***energies:\n", energies, "\n length", len(energies))
+        #sys.exit(print("\n ***trans_vectors:\n", trans_vectors, "\n length", len(trans_vectors)))                    
         
-
-        #self._resampled_trans_vectors = [trans_vectors[ind] for ind in sel_ind]
+        self._resampled_energies = [energies[ind] for ind in sel_ind]
+        self._resampled_trans_vectors = [trans_vectors[ind] for ind in sel_ind]
         del energies
         del trans_vectors
 

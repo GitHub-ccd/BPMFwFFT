@@ -258,6 +258,7 @@ class LigGrid(Grid):
             self._crd[atom_ind] += displacement
         
         self._initial_com = self._get_molecule_center_of_mass()
+        #print("*****   grids.py Lig Initial.com:", self._initial_com)
         return None
     
     def _get_charges(self, name):
@@ -275,9 +276,6 @@ class LigGrid(Grid):
 
     def _cal_charge_grid(self, name):          #5 
         charges = self._get_charges(name)
-        # This Debug
-        #sys.exit(print("\n ***debug self._eight_corner_shifts: ", self._eight_corner_shifts ,\
-        #"\n ***debug self._grid-x: ", len(self._grid["x"]),  "\n***debug***"))
         grid = c_cal_charge_grid(name, self._crd, charges, self._origin_crd, 
                                 self._uper_most_corner_crd, self._uper_most_corner,
                                 self._grid["spacing"], self._eight_corner_shifts, self._six_corner_shifts,
@@ -648,15 +646,6 @@ class RecGrid(Grid):
         receptor_box_center = (upper_receptor_corner + lower_receptor_corner) / 2.
         grid_center = (self._origin_crd + self._uper_most_corner_crd) / 2.
         displacement = grid_center - receptor_box_center
-        # This Debug
-        #print("\n ***self._origin_crd: ", self._origin_crd)
-        #print("\n ***self._uper_most_corner_crd: ", self._uper_most_corner_crd)
-        #print("\n ***receptor_box_center: ", receptor_box_center)
-        #print("\n ***grid_center: ", grid_center)
-        #sys.exit(print("\n ***debug displacement: ", displacement))
-
-        print("Receptor is translated by ", displacement)
-
         for atom_ind in range(len(self._crd)):
             self._crd[atom_ind] += displacement
         return None
